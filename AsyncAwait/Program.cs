@@ -1,23 +1,48 @@
 ﻿using System;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace AsyncAwait
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
+        {
+            string url1 = "https://codeavecjonathan.com/res/dummy.txt";
+            string url2 = "https://codeavecjonathan.com/res/pizzas1.json";
+
+            Console.Write("Téléchargement...");
+
+           var DisplayTask = DisplayProgress();
+           var downloadTask1 = DownloadData(url1);
+           var downloadTask2 = DownloadData(url2);
+
+            await downloadTask1;
+            await downloadTask2;   
+            
+            await Task.WhenAll(downloadTask1,downloadTask2);
+
+           Console.WriteLine("FIN DU PROGRAMME");
+        }
+
+        static async Task DownloadData(string url) 
         {
             var httpClient = new HttpClient();
+            
+            var resultat = await httpClient.GetStringAsync(url);
+            
+            Console.WriteLine("OK --> "+url);
 
-            Console.WriteLine("Téléchargement en cours");
-            string url = "https://codeavecjonathan.com/res/dummy.txt";
-            var task = httpClient.GetStringAsync(url);
-            task.Wait();
+          // Console.WriteLine(resultat);
+        }
 
-            Console.WriteLine("OK");
-
-            Console.WriteLine(task.Result); 
-
+        static async Task DisplayProgress()
+        {
+            while (true)
+            {
+                await Task.Delay(500);
+                Console.Write(".");
+            }
         }
     }
 }
